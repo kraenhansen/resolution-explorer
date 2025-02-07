@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import { Box } from "ink";
 
@@ -16,6 +16,8 @@ export function Explorer({ resolutions, initialFilter }: ExplorerProps) {
   const { rows, columns } = useStdoutDimensions();
   const [filter, setFilter] = useState<string>(initialFilter ?? "");
   const [resolution, setResolution] = useState<Resolution | null>(null);
+  const [highlightedResolution, setHighlightedResolution] =
+    useState<Resolution | null>(null);
 
   return (
     <>
@@ -31,7 +33,10 @@ export function Explorer({ resolutions, initialFilter }: ExplorerProps) {
             height={rows}
             width={columns}
             resolutions={resolutions}
+            resolution={resolution}
             setResolution={setResolution}
+            highlightedResolution={highlightedResolution}
+            setHighlightedResolution={setHighlightedResolution}
             filter={filter}
             setFilter={setFilter}
           />

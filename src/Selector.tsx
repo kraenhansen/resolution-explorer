@@ -12,10 +12,19 @@ import chalk from "chalk";
 type SelectorProps = {
   resolutions: Resolution[];
   filter: string;
+  resolution: Resolution | null;
   setResolution: (resolution: Resolution) => void;
+  highlightedResolution: Resolution | null;
+  setHighlightedResolution: (resolution: Resolution) => void;
   height: number;
   width: number;
   setFilter(filter: string): void;
+};
+
+type Item = {
+  key?: string;
+  label: string;
+  value: Resolution;
 };
 
 export function Selector({
@@ -23,11 +32,13 @@ export function Selector({
   height,
   width,
   setResolution,
+  highlightedResolution,
+  setHighlightedResolution,
   filter,
   setFilter,
 }: SelectorProps) {
   // Taking account for the input field
-  const visibleTargets = height - 2;
+  const visibleItems = height - 2;
 
   const [filteredResolutions, highlighter] = useFilteredResolutions(
     resolutions,
@@ -40,12 +51,21 @@ export function Selector({
       filteredResolutions.map((resolution) => {
         const index = chalk.dim(`[${resolution.index}]`);
         return {
-          key: resolution.index.toString(),
+          key: resolution.index.toString() as string | undefined,
           label: `${index} ${highlighter(resolution.target)} ${chalk.dim("from")} ${highlighter(path.relative(process.cwd(), resolution.from))}`,
           value: resolution,
-        };
+        } as Item;
       }),
     [filteredResolutions]
+  );
+
+  const initialIndex = useMemo(
+    () =>
+      Math.max(
+        0,
+        items.findIndex(({ value }) => value === highlightedResolution)
+      ),
+    [items, highlightedResolution]
   );
 
   return (
@@ -72,8 +92,14 @@ export function Selector({
       ) : (
         <SelectInput
           items={items}
-          limit={visibleTargets}
-          onSelect={({ value }) => setResolution(value)}
+          limit={visibleItems}
+          initialIndex={initialIndex}
+          onSelect={({ value }) => {
+            // In the case that the user select without moving the cursor
+            setHighlightedResolution(value);
+            setResolution(value);
+          }}
+          onHighlight={({ value }) => setHighlightedResolution(value)}
         />
       )}
     </Box>
