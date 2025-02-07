@@ -2,7 +2,7 @@
   "name": "resolution-explorer",
   "version": "0.1.0",
   "type": "module",
-  "description": "Explore the output from `tsc --traceResolution`",
+  "description": "Interactive explorer, to better understand the how the TypeScript compiler resolved modules.",
   "bin": {
     "resolution-explorer": "./bin/resolution-explorer.js"
   },
