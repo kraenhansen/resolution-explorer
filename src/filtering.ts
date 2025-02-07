@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Resolution } from "./TraceParser.js";
-import chalk from "chalk";
 
 function resolutionMatch(
   resolution: Record<string, unknown>,

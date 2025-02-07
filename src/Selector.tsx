@@ -34,6 +34,7 @@ export function Selector({
     filter,
     (text) => chalk.bgBlue(text)
   );
+
   const items = useMemo(
     () =>
       filteredResolutions.map((resolution) => {
@@ -66,11 +67,15 @@ export function Selector({
           onChange={setFilter}
         />
       </Box>
-      <SelectInput
-        items={items}
-        limit={visibleTargets}
-        onSelect={({ value }) => setResolution(value)}
-      />
+      {items.length === 0 ? (
+        <Text italic>No resolutions match the filter</Text>
+      ) : (
+        <SelectInput
+          items={items}
+          limit={visibleTargets}
+          onSelect={({ value }) => setResolution(value)}
+        />
+      )}
     </Box>
   );
 }

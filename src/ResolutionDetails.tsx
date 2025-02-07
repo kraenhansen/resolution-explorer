@@ -1,13 +1,9 @@
-import React, { useMemo } from "react";
+import React from "react";
 
 import { Box, Text, useInput } from "ink";
 
 import type { Resolution } from "./TraceParser.js";
 import chalk from "chalk";
-
-function matchQuery(resolution: Resolution, query: string) {
-  return resolution.target.includes(query);
-}
 
 type ResolutionDetailsProps = {
   resolution: Resolution;
