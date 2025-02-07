@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Interactive explorer, to better understand the how the TypeScript compiler resolved modules.",
   "bin": {
-    "resolution-explorer": "./bin/resolution-explorer.js"
+    "resolution-explorer": "bin/resolution-explorer.js"
   },
   "exports": {
     ".": {
