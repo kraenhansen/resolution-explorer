@@ -16,7 +16,7 @@ export function ResolutionDetails({
   resolution,
   height,
 }: ResolutionDetailsProps) {
-  useInput((input, key) => {
+  useInput((_input, key) => {
     if (key.escape || key.delete) {
       onClearSelection();
     }
@@ -50,7 +50,7 @@ export function ResolutionDetails({
         {resolution ? (
           <>
             {resolution.details.map((line, index) => (
-              <Text>{line}</Text>
+              <Text key={index}>{line}</Text>
             ))}
           </>
         ) : (
