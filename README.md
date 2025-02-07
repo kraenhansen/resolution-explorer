@@ -6,4 +6,4 @@ Interactive explorer, to better understand the how the TypeScript compiler resol
 npx resolution-explorer
 ```
 
-[![resolution-explorer example](https://github.com/kraenhansen/resolution-explorer/raw/refs/heads/main/docs/usage.gif)](https://github.com/kraenhansen/resolution-explorer/raw/refs/heads/main/docs/usage.mov)
+![resolution-explorer example](https://github.com/kraenhansen/resolution-explorer/blob/main/docs/usage.gif?raw=true)

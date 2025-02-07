@@ -12,6 +12,10 @@
       "default": "./dist/index.ts"
     }
   },
+  "files": [
+    "dist",
+    "bin"
+  ],
   "scripts": {
     "start": "tsx src/cli.ts",
     "build": "tsc --build"
