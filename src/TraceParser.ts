@@ -4,10 +4,12 @@ import * as fs from "node:fs";
 import assert from "node:assert/strict";
 
 export type Resolution = {
+  index: number;
   type: "reference" | "module";
   state: "resolving" | "resolved" | "failed";
   target: string;
   from: string;
+  details: string[];
   result: string | undefined;
   packageId: string | undefined;
   rootDirectory: string | undefined;
@@ -71,6 +73,7 @@ export class TraceParser {
             state: "resolving",
             target,
             from,
+            details: [],
             result: undefined,
             packageId: undefined,
             rootDirectory: undefined,
@@ -105,6 +108,7 @@ export class TraceParser {
             state: "resolving",
             target,
             from,
+            details: [],
             result: undefined,
             packageId: undefined,
             rootDirectory,
@@ -133,18 +137,20 @@ export class TraceParser {
           console.log(`Unknown heading: ${line}`);
           throw new Error("Unknown heading");
         }
+      } else if (this.#currentResolution) {
+        this.#currentResolution.details.push(line);
       }
     }
   }
 
-  private startResolution(resolution: Resolution) {
+  private startResolution(resolution: Omit<Resolution, "index">) {
     assert.equal(
       this.#currentResolution,
       null,
       "Expected no current resolution"
     );
-    this.#currentResolution = resolution;
-    this.resolutions.push(resolution);
+    this.#currentResolution = { ...resolution, index: this.resolutions.length };
+    this.resolutions.push(this.#currentResolution);
   }
 
   private updateResolution(

@@ -3,44 +3,44 @@ import React, { useMemo, useRef, useState } from "react";
 import { Box, DOMElement, Text } from "ink";
 import TextInput from "ink-text-input";
 
-import type { Resolution, TraceParser } from "./TraceParser.js";
+import type { Resolution } from "./TraceParser.js";
+import type { ResolutionFilter } from "./filtering.js";
 import { useStdoutDimensions } from "./useStdoutDimensions.js";
 import { Selector } from "./Selector.js";
-import { TargetDetails } from "./TargetDetails.js";
+import { ResolutionDetails } from "./ResolutionDetails.js";
 
-function matchQuery(resolution: Resolution, query: string) {
-  return resolution.target.includes(query);
-}
-
-type Filter = {
-  targetPattern: RegExp | null;
-  fromPattern: RegExp | null;
+type ExplorerProps = {
+  resolutions: Resolution[];
+  initialFilter?: ResolutionFilter;
 };
 
-type ExplorerProps = { resolutions: Resolution[]; filter: Filter };
-
-export function Explorer({ resolutions }: ExplorerProps) {
+export function Explorer({ resolutions, initialFilter }: ExplorerProps) {
   const { rows } = useStdoutDimensions();
-  const [selectedTarget, setSelectedTarget] = useState<string | null>(null);
-
-  const uniqueTargets = useMemo(() => {
-    return [...new Set(resolutions.map((resolution) => resolution.target))];
-  }, [resolutions]);
+  const [filter, setFilter] = useState<ResolutionFilter>(
+    initialFilter ?? {
+      target: null,
+      from: null,
+    }
+  );
+  const [resolution, setResolution] = useState<Resolution | null>(null);
 
   return (
     <>
       <Box overflow="hidden">
-        <Selector
-          height={rows}
-          targets={uniqueTargets}
-          selectedTarget={selectedTarget}
-          setSelectedTarget={setSelectedTarget}
-        />
-        <TargetDetails
-          height={rows}
-          resolutions={resolutions}
-          target={selectedTarget}
-        />
+        {resolution ? (
+          <ResolutionDetails
+            height={rows}
+            resolution={resolution}
+            onClearSelection={() => setResolution(null)}
+          />
+        ) : (
+          <Selector
+            height={rows}
+            resolutions={resolutions}
+            setResolution={setResolution}
+            filter={filter}
+          />
+        )}
       </Box>
     </>
   );

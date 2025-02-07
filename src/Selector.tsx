@@ -5,59 +5,54 @@ import TextInput from "ink-text-input";
 import SelectInput from "ink-select-input";
 
 import type { Resolution } from "./TraceParser.js";
+import {
+  ResolutionFilter,
+  useFilteredResolutions,
+  useResolutionFilter,
+} from "./filtering.js";
+import chalk from "chalk";
 
 function matchQuery(resolution: Resolution, query: string) {
   return resolution.target.includes(query);
 }
 
 type SelectorProps = {
-  targets: string[];
-  selectedTarget: string | null;
-  setSelectedTarget: (target: string | null) => void;
+  resolutions: Resolution[];
+  filter: ResolutionFilter;
   height: number;
+  setResolution: (resolution: Resolution) => void;
 };
 
 export function Selector({
-  targets,
-  selectedTarget,
-  setSelectedTarget,
+  resolutions,
   height,
+  filter,
+  setResolution,
 }: SelectorProps) {
-  const [query, setQuery] = useState("");
-  const ref = useRef<DOMElement>(null);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  useInput((input, key) => {
-    if (key.upArrow) {
-      setSelectedIndex((prev) => Math.max(0, prev - 1));
-    } else if (key.downArrow) {
-      setSelectedIndex((prev) => Math.min(targets.length - 1, prev + 1));
-    } else if (key.escape || key.backspace) {
-      setSelectedTarget(null);
-    }
-  });
-
   // Taking account for the input field
-  const visibleTargets = height - 2;
+  const visibleTargets = height - 1;
 
-  const filteredTargets = useMemo(
+  const filteredResolutions = useFilteredResolutions(resolutions, filter);
+  const items = useMemo(
     () =>
-      targets
-        .filter((target) =>
-          target.toLocaleLowerCase().includes(query.toLocaleLowerCase())
-        )
-        .map((target) => ({ key: target, label: target, value: target })),
-    [targets, query, visibleTargets]
+      filteredResolutions.map((resolution) => {
+        const index = chalk.dim(`[${resolution.index}]`);
+        return {
+          key: resolution.index.toString(),
+          label: `${index} ${resolution.target} ${chalk.dim("from")} ${resolution.from}`,
+          value: resolution,
+        };
+      }),
+    [filteredResolutions]
   );
 
   return (
-    <Box height={height} flexDirection="column" flexBasis="30%">
-      <TextInput value={query} onChange={setQuery} />
+    <Box height={height} flexDirection="column">
+      <Text bold>Pick a resolution</Text>
       <SelectInput
-        items={filteredTargets}
+        items={items}
         limit={visibleTargets}
-        isFocused={selectedTarget === null}
-        onSelect={({ value }) => setSelectedTarget(value)}
+        onSelect={({ value }) => setResolution(value)}
       />
     </Box>
   );
