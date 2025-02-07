@@ -1,0 +1,40 @@
+{
+  "name": "explore-resolution-trace",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Explore the output from `tsc --traceResolution`",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "tsx src/cli.ts",
+    "build": "tsc --build"
+  },
+  "keywords": [
+    "typescript",
+    "resolution",
+    "trace",
+    "trace-resolution",
+    "cli"
+  ],
+  "author": {
+    "name": "Kræn Hansen",
+    "url": "https://github.com/kraenhansen"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "ink": "^5.1.0",
+    "ink-select-input": "^6.0.0",
+    "ink-text-input": "^6.0.0",
+    "react": "^18.3.1",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.0",
+    "@types/node": "^22.13.1",
+    "@types/react": "^18.3.1",
+    "@types/yargs": "^17.0.33",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

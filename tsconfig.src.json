@@ -1,0 +1,11 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "jsx": "react"
+  },
+  "include": ["src"],
+  "exclude": ["src/tests", "src/**/*.test.ts"]
+}
