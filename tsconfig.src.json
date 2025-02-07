@@ -4,7 +4,9 @@
     "composite": true,
     "outDir": "dist",
     "rootDir": "src",
-    "jsx": "react"
+    "jsx": "react",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
   },
   "include": ["src"],
   "exclude": ["src/tests", "src/**/*.test.ts"]
