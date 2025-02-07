@@ -1,9 +1,17 @@
 {
-  "name": "explore-resolution-trace",
+  "name": "resolution-explorer",
   "version": "0.1.0",
   "type": "module",
   "description": "Explore the output from `tsc --traceResolution`",
-  "main": "dist/index.js",
+  "bin": {
+    "resolution-explorer": "./bin/resolution-explorer.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.ts"
+    }
+  },
   "scripts": {
     "start": "tsx src/cli.ts",
     "build": "tsc --build"

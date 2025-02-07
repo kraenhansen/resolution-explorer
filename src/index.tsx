@@ -11,6 +11,7 @@ import { TraceParser } from "./TraceParser.js";
 
 export function run(args = hideBin(process.argv)) {
   yargs(args)
+    .scriptName("resolution-explorer")
     .command(
       "$0 [trace]",
       "Explore a trace file",
