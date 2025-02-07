@@ -1,27 +1,20 @@
 import React, { useMemo, useRef, useState } from "react";
 
-import { Box, DOMElement, Text } from "ink";
-import TextInput from "ink-text-input";
+import { Box } from "ink";
 
 import type { Resolution } from "./TraceParser.js";
-import type { ResolutionFilter } from "./filtering.js";
 import { useStdoutDimensions } from "./useStdoutDimensions.js";
 import { Selector } from "./Selector.js";
 import { ResolutionDetails } from "./ResolutionDetails.js";
 
 type ExplorerProps = {
   resolutions: Resolution[];
-  initialFilter?: ResolutionFilter;
+  initialFilter?: string;
 };
 
 export function Explorer({ resolutions, initialFilter }: ExplorerProps) {
-  const { rows } = useStdoutDimensions();
-  const [filter, setFilter] = useState<ResolutionFilter>(
-    initialFilter ?? {
-      target: null,
-      from: null,
-    }
-  );
+  const { rows, columns } = useStdoutDimensions();
+  const [filter, setFilter] = useState<string>(initialFilter ?? "");
   const [resolution, setResolution] = useState<Resolution | null>(null);
 
   return (
@@ -36,9 +29,11 @@ export function Explorer({ resolutions, initialFilter }: ExplorerProps) {
         ) : (
           <Selector
             height={rows}
+            width={columns}
             resolutions={resolutions}
             setResolution={setResolution}
             filter={filter}
+            setFilter={setFilter}
           />
         )}
       </Box>

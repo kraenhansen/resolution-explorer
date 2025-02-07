@@ -1,45 +1,50 @@
 import { useMemo } from "react";
 import { Resolution } from "./TraceParser.js";
-
-function matchQuery(resolution: Resolution, query: string) {
-  return resolution.target.includes(query);
-}
-
-export type ResolutionFilter = {
-  target: RegExp | null;
-  from: RegExp | null;
-};
+import chalk from "chalk";
 
 function resolutionMatch(
   resolution: Record<string, unknown>,
-  prop: string,
+  prop: keyof Resolution,
   pattern: RegExp
 ) {
-  if (pattern === null) return true;
   return (
-    prop in resolution &&
-    typeof resolution[prop] === "string" &&
-    resolution[prop].match(pattern)
+    typeof resolution[prop] === "string" && resolution[prop].match(pattern)
   );
 }
 
-export function useResolutionFilter(filter: ResolutionFilter) {
+export function useResolutionFilter(
+  filter: string,
+  highlighterCallback: (text: string) => string
+) {
   return useMemo(() => {
-    return (resolution: Resolution) =>
-      Object.entries(filter).every(
-        ([key, pattern]) =>
-          pattern === null || resolutionMatch(resolution, key, pattern)
+    const patterns = filter
+      .split(" ")
+      .map((pattern) => new RegExp(pattern, "g"));
+    const filterCallback = (resolution: Resolution) =>
+      patterns.every(
+        (pattern) =>
+          resolutionMatch(resolution, "target", pattern) ||
+          resolutionMatch(resolution, "from", pattern)
       );
-  }, Object.values(filter));
+    const highlighter = (text: string) =>
+      patterns.reduce((acc, pattern) => {
+        return acc.replaceAll(pattern, highlighterCallback);
+      }, text);
+    return { filterCallback, highlighter };
+  }, [filter]);
 }
 
 export function useFilteredResolutions(
   resolutions: Resolution[],
-  filter: ResolutionFilter
+  filter: string,
+  highlighterCallback: (text: string) => string
 ) {
-  const filterCallback = useResolutionFilter(filter);
+  const { filterCallback, highlighter } = useResolutionFilter(
+    filter,
+    highlighterCallback
+  );
   return useMemo(
-    () => resolutions.filter(filterCallback),
+    () => [resolutions.filter(filterCallback), highlighter] as const,
     [resolutions, filter]
   );
 }
