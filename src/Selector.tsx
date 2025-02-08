@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import path from "node:path";
 
 import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
@@ -8,6 +7,7 @@ import SelectInput from "ink-select-input";
 import type { Resolution } from "./TraceParser.js";
 import { useFilteredResolutions } from "./filtering.js";
 import chalk from "chalk";
+import { getResolutionLabel } from "./resolution-label.js";
 
 type SelectorProps = {
   resolutions: Resolution[];
@@ -49,14 +49,13 @@ export function Selector({
   const items = useMemo(
     () =>
       filteredResolutions.map((resolution) => {
-        const index = chalk.dim(`[${resolution.index}]`);
         return {
           key: resolution.index.toString() as string | undefined,
-          label: `${index} ${highlighter(resolution.target)} ${chalk.dim("from")} ${highlighter(path.relative(process.cwd(), resolution.from))}`,
+          label: getResolutionLabel(resolution, highlighter),
           value: resolution,
         } as Item;
       }),
-    [filteredResolutions]
+    [filteredResolutions, highlighter]
   );
 
   const initialIndex = useMemo(

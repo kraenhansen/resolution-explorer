@@ -3,7 +3,7 @@ import React from "react";
 import { Box, Text, useInput } from "ink";
 
 import type { Resolution } from "./TraceParser.js";
-import chalk from "chalk";
+import { getResolutionLabel } from "./resolution-label.js";
 
 type ResolutionDetailsProps = {
   resolution: Resolution;
@@ -41,11 +41,7 @@ export function ResolutionDetails({
           borderLeft={false}
           borderRight={false}
         >
-          <Text>
-            {chalk.dim(`[${resolution.index}]`)} {resolution.target}
-            {chalk.dim(" from ")}
-            {resolution.from}
-          </Text>
+          <Text>{getResolutionLabel(resolution)}</Text>
         </Box>
         {resolution ? (
           <>

@@ -11,6 +11,8 @@ function resolutionMatch(
   );
 }
 
+const KEYS_TO_FILTER = ["target", "from", "to"] as const;
+
 export function useResolutionFilter(
   filter: string,
   highlighterCallback: (text: string) => string
@@ -20,10 +22,8 @@ export function useResolutionFilter(
       .split(" ")
       .map((pattern) => new RegExp(pattern, "g"));
     const filterCallback = (resolution: Resolution) =>
-      patterns.every(
-        (pattern) =>
-          resolutionMatch(resolution, "target", pattern) ||
-          resolutionMatch(resolution, "from", pattern)
+      patterns.every((pattern) =>
+        KEYS_TO_FILTER.some((key) => resolutionMatch(resolution, key, pattern))
       );
     const highlighter = (text: string) =>
       patterns.reduce((acc, pattern) => {

@@ -10,7 +10,7 @@ export type Resolution = {
   target: string;
   from: string;
   details: string[];
-  result: string | undefined;
+  to: string | undefined;
   packageId: string | undefined;
   rootDirectory: string | undefined;
   primary: boolean | undefined;
@@ -44,13 +44,16 @@ export class TraceParser {
     });
 
     for await (const line of rl) {
+      if (this.#currentResolution) {
+        this.#currentResolution.details.push(line);
+      }
       if (line.startsWith("========")) {
         // New heading
         const resolvingModuleMatch = line.match(
           /======== Resolving module '(?<target>[^']+)' from '(?<from>[^']+)'. ========/
         );
         const successMatch = line.match(
-          /======== Module name '(?<target>[^']+)' was successfully resolved to '(?<result>[^']+)'(?: with Package ID '(?<packageId>[^']+)')?. ========/
+          /======== Module name '(?<target>[^']+)' was successfully resolved to '(?<to>[^']+)'(?: with Package ID '(?<packageId>[^']+)')?. ========/
         );
         const failedMatch = line.match(
           /======== Module name '(?<target>[^']+)' was not resolved. ========/
@@ -59,7 +62,7 @@ export class TraceParser {
           /======== Resolving type reference directive '(?<target>[^']+)', containing file '(?<from>[^']+)'(?:, root directory '(?<rootDirectory>[^']+)')?. ========/
         );
         const successReferenceMatch = line.match(
-          /======== Type reference directive '(?<target>[^']+)' was successfully resolved to '(?<result>[^']+)'(?: with Package ID '(?<packageId>[^']+)')?(?:, primary: (?<primary>\w+))?. ========/
+          /======== Type reference directive '(?<target>[^']+)' was successfully resolved to '(?<to>[^']+)'(?: with Package ID '(?<packageId>[^']+)')?(?:, primary: (?<primary>\w+))?. ========/
         );
 
         if (resolvingModuleMatch) {
@@ -74,18 +77,18 @@ export class TraceParser {
             target,
             from,
             details: [],
-            result: undefined,
+            to: undefined,
             packageId: undefined,
             rootDirectory: undefined,
             primary: undefined,
           });
         } else if (successMatch) {
           assert(successMatch.groups, "Expected a match to have groups");
-          const { target, result, packageId } = successMatch.groups;
+          const { target, to, packageId } = successMatch.groups;
           assert(this.#currentResolution, "Expected a current resolution");
           this.endResolution({
             target,
-            result,
+            to,
             packageId,
             state: "resolved",
           });
@@ -109,7 +112,7 @@ export class TraceParser {
             target,
             from,
             details: [],
-            result: undefined,
+            to: undefined,
             packageId: undefined,
             rootDirectory,
             primary: undefined,
@@ -119,12 +122,12 @@ export class TraceParser {
             successReferenceMatch.groups,
             "Expected a match to have groups"
           );
-          const { target, result, packageId, primary } =
+          const { target, to, packageId, primary } =
             successReferenceMatch.groups;
           this.endResolution({
             target,
             state: "resolved",
-            result,
+            to,
             packageId,
             primary:
               primary === "true"
@@ -137,8 +140,6 @@ export class TraceParser {
           console.log(`Unknown heading: ${line}`);
           throw new Error("Unknown heading");
         }
-      } else if (this.#currentResolution) {
-        this.#currentResolution.details.push(line);
       }
     }
   }
