@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import { Box } from "ink";
 
@@ -15,18 +15,48 @@ type ExplorerProps = {
 export function Explorer({ resolutions, initialFilter }: ExplorerProps) {
   const { rows, columns } = useStdoutDimensions();
   const [filter, setFilter] = useState<string>(initialFilter ?? "");
-  const [resolution, setResolution] = useState<Resolution | null>(null);
+
+  const [resolutionStack, setResolutionStack] = useState<Resolution[]>([]);
+  const resolution = useMemo(
+    () =>
+      resolutionStack.length > 0
+        ? resolutionStack[resolutionStack.length - 1]
+        : null,
+    [resolutionStack]
+  );
+  const pushResolution = useCallback(
+    (resolution: Resolution) =>
+      setResolutionStack([...resolutionStack, resolution]),
+    [resolution, resolutionStack]
+  );
+  const popResolution = useCallback(
+    () => setResolutionStack(resolutionStack.slice(0, -1)),
+    [resolution, resolutionStack]
+  );
+
   const [highlightedResolution, setHighlightedResolution] =
     useState<Resolution | null>(null);
 
+  // Computing all outgoing resolutions for the selected resolution
+  const outgoingResolutions = useMemo(
+    () =>
+      resolution
+        ? resolutions.filter((other) => other.from === resolution.to)
+        : [],
+    [resolutions, resolution]
+  );
+
   return (
     <>
-      <Box overflow="hidden">
+      <Box overflow="hidden" flexDirection="column">
         {resolution ? (
           <ResolutionDetails
+            key={resolution.index}
             height={rows}
             resolution={resolution}
-            onClearSelection={() => setResolution(null)}
+            pushResolution={pushResolution}
+            popResolution={popResolution}
+            outgoingResolutions={outgoingResolutions}
           />
         ) : (
           <Selector
@@ -34,7 +64,7 @@ export function Explorer({ resolutions, initialFilter }: ExplorerProps) {
             width={columns}
             resolutions={resolutions}
             resolution={resolution}
-            setResolution={setResolution}
+            setResolution={pushResolution}
             highlightedResolution={highlightedResolution}
             setHighlightedResolution={setHighlightedResolution}
             filter={filter}
